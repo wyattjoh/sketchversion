@@ -3,6 +3,7 @@
 		"default",
 		"publish-github"
 	],
+	"BuildConstraints": "darwin",
 	"PackageVersion": "1.0.0",
 	"TaskSettings": {
 		"publish-github": {

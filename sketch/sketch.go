@@ -123,13 +123,18 @@ func CheckLicense(license string) (*time.Time, error) {
 	defer res.Body.Close()
 
 	var payload struct {
-		Data struct {
+		Status int `json:"status"`
+		Data   struct {
 			CurrentUpdateExpiration int64 `json:"current_update_expiration"`
 		} `json:"data"`
 	}
 
 	if err := json.NewDecoder(res.Body).Decode(&payload); err != nil {
 		return nil, errors.Wrap(err, "can't parse the license response")
+	}
+
+	if payload.Status != 1 {
+		return nil, errors.New("license check failed")
 	}
 
 	expirationDate := time.Unix(payload.Data.CurrentUpdateExpiration, 0)

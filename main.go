@@ -32,6 +32,11 @@ func main() {
 
 	flag.Parse()
 
+	if flag.NArg() != 1 {
+		fmt.Fprintln(os.Stderr, "usage: sketchversion [-download] <license key>")
+		os.Exit(1)
+	}
+
 	license := flag.Arg(0)
 
 	release, err := GetSketchRelease(license)
