@@ -8,6 +8,25 @@ import (
 	"github.com/wyattjoh/sketchversion/sketch"
 )
 
+func GetSketchRelease(license string) (*sketch.Release, error) {
+	current, err := sketch.CheckLicense(license)
+	if err != nil {
+		return nil, err
+	}
+
+	versions, err := sketch.GetVersions()
+	if err != nil {
+		return nil, err
+	}
+
+	release, err := sketch.FindLatestReleaseForLicense(*current, versions)
+	if err != nil {
+		return nil, err
+	}
+
+	return release, nil
+}
+
 func main() {
 	download := flag.Bool("download", false, "download the zip automatically")
 
@@ -15,35 +34,23 @@ func main() {
 
 	license := flag.Arg(0)
 
-	current, err := sketch.CheckLicense(license)
+	release, err := GetSketchRelease(license)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "can't get the current license: %v\n", err)
-		os.Exit(1)
-	}
-
-	versions, err := sketch.GetVersions()
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "can't get the versions: %v\n", err)
-		os.Exit(1)
-	}
-
-	version, err := sketch.FindLatestReleaseForLicense(*current, versions)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "can't get the version: %v\n", err)
+		fmt.Fprintf(os.Stderr, "can't get the release: %v\n", err)
 		os.Exit(1)
 	}
 
 	if *download {
-		fmt.Printf("Matched to version %s, downloading\n", version.Version)
+		fmt.Printf("Matched to version %s, downloading\n", release.VersionString)
 
-		path, err := sketch.Download(*version)
+		path, err := sketch.Download(*release)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "can't download the version: %v\n", err)
 			os.Exit(1)
 		}
 
-		fmt.Printf("Downloaded version %s to %s\n", version.Version, path)
+		fmt.Printf("Downloaded version %s to %s\n", release.VersionString, path)
 	} else {
-		fmt.Printf("Your most recent version is %s.\n\n\tDownload: %s\n\n", version.Version, version.DownloadURL)
+		fmt.Printf("Your most recent version is %s.\n\n\tDownload: %s\n\n", release.VersionString, release.DownloadURL)
 	}
 }
