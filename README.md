@@ -1,5 +1,7 @@
 # sketchversion
 
+[![Build Status](https://travis-ci.org/wyattjoh/sketchversion.svg?branch=master)](https://travis-ci.org/wyattjoh/sketchversion)
+
 sketchversion will allow you to easily download your version of sketch matching
 your license.
 
